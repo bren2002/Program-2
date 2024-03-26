@@ -11,9 +11,9 @@ template <typename T>
 class Node {
 public:
     T data;
-    Node<T>* next;
+    Node<T> *next;
 
-    Node(T data) : data(data), next(nullptr) {}
+    Node(const T& newData, Node<T> *nextNode = nullptr) : data(newData), next(nextNode) {}
 };
 
 #endif
