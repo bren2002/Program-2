@@ -4,7 +4,6 @@
  * March 25, 2024
  */
 
-
 #ifndef NODE_H
 #define NODE_H
 
