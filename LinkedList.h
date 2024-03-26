@@ -11,17 +11,6 @@
 #include "ListIterator.h"
 #include <stdexcept>
 
-/**
- * @class LinkedList
- * 
- * @brief A linked list implementation.
- * 
- * This class represents a linked list data structure.
- * It allows for efficient insertion and removal of elements at both the beginning and end of the list.
- * It also provides methods for accessing and manipulating the elements in the list.
- * 
- * @tparam T The type of elements stored in the list.
- */
 template<typename T>
 class LinkedList {
 private: 
