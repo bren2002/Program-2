@@ -4,91 +4,109 @@
  * March 25, 2024
  */
 
-#ifndef LINKED_LIST_PQ_H
-#define LINKED_LIST_PQ_H
+#ifndef LINKEDLISTPQ_H
+#define LINKEDLISTPQ_H
 
 #include "PriorityQueue.h"
-#include <stdexcept>
-#include <iostream> // Include iostream for std::ostream
+#include "LinkedList.h"
+#include <stdexcept> // Include <stdexcept> for std::runtime_error
 
-template <typename T>
+template<typename T>
 class LinkedListPQ : public PriorityQueue<T> {
 public:
     LinkedListPQ();
     ~LinkedListPQ();
-    void insert(const T& data, int priority);
-    T removeMin();
-    bool isEmpty() const;
-
-protected:
-    void print(std::ostream& os) const override;
+    bool insert(const T& data, int priority) override;
+    T remove() override;
+    void print(std::ostream& os) const override; 
+    bool deleteAll(const T& obj) override;
+    T peek() override;
+    bool contains(const T& obj) override;
+    int size() override;
+    void clear() override;
+    bool isEmpty() override;
+    bool isFull() override;
+    ListIterator<T> first() override;
+    ListIterator<T> end() override;
 
 private:
-    struct Node {
-        T data;
-        int priority;
-        Node* next;
-
-        Node(const T& d, int p, Node* n) : data(d), priority(p), next(n) {}
-    };
-
-    Node* m_front;
+    LinkedList<T> list;
 };
 
-template <typename T>
-LinkedListPQ<T>::LinkedListPQ() : m_front(nullptr) {}
+template<typename T>
+LinkedListPQ<T>::LinkedListPQ() {}
 
-template <typename T>
-LinkedListPQ<T>::~LinkedListPQ() {
-    while (m_front) {
-        Node* next = m_front->next;
-        delete m_front;
-        m_front = next;
+template<typename T>
+LinkedListPQ<T>::~LinkedListPQ() {}
+
+template<typename T>
+bool LinkedListPQ<T>::insert(const T& data, int priority) {
+    list.addLast(data);
+    return true;
+}
+
+template<typename T>
+T LinkedListPQ<T>::remove() {
+    if (list.isEmpty()) {
+        throw std::runtime_error("Error: cannot remove from an empty priority queue");
     }
+    return list.removeFirst();
 }
 
-template <typename T>
-void LinkedListPQ<T>::insert(const T& data, int priority) {
-    if (!m_front || priority < m_front->priority) {
-        m_front = new Node(data, priority, m_front);
-    } else {
-        Node* prev = m_front;
-        Node* curr = m_front->next;
-        while (curr && priority >= curr->priority) {
-            prev = curr;
-            curr = curr->next;
-        }
-        prev->next = new Node(data, priority, curr);
-    }
-}
-
-template <typename T>
-T LinkedListPQ<T>::removeMin() {
-    if (isEmpty()) {
-        throw std::logic_error("Priority queue is empty");
-    }
-    T data = m_front->data;
-    Node* temp = m_front;
-    m_front = m_front->next;
-    delete temp;
-    return data;
-}
-
-template <typename T>
-bool LinkedListPQ<T>::isEmpty() const {
-    return !m_front;
-}
-
-template <typename T>
+template<typename T>
 void LinkedListPQ<T>::print(std::ostream& os) const {
-    Node* curr = m_front;
-    os << "Priority Queue (Lowest Priority to Highest Priority): ";
-    while (curr) {
-        os << "(" << curr->data << ", " << curr->priority << ") ";
-        curr = curr->next;
-    }
-    os << std::endl;
+    os << "Priority Queue: ";
+    list.print(os);
 }
 
-#endif 
+template<typename T>
+bool LinkedListPQ<T>::deleteAll(const T& obj) {
+    return list.deleteAll(obj);
+}
+
+template<typename T>
+T LinkedListPQ<T>::peek() {
+    if (list.isEmpty()) {
+        throw std::runtime_error("Error: cannot peek an empty priority queue");
+    }
+    return list.peekFirst();
+}
+
+template<typename T>
+bool LinkedListPQ<T>::contains(const T& obj) {
+    return list.contains(obj);
+}
+
+template<typename T>
+int LinkedListPQ<T>::size() {
+    return list.size();
+}
+
+template<typename T>
+void LinkedListPQ<T>::clear() {
+    list.clear();
+}
+
+template<typename T>
+bool LinkedListPQ<T>::isEmpty() {
+    return list.isEmpty();
+}
+
+template<typename T>
+bool LinkedListPQ<T>::isFull() {
+
+    return false;
+}
+
+template<typename T>
+ListIterator<T> LinkedListPQ<T>::first() {
+    return list.first();
+}
+
+template<typename T>
+ListIterator<T> LinkedListPQ<T>::end() {
+    return list.end();
+}
+
+#endif
 
