@@ -7,23 +7,39 @@
 #ifndef LISTITERATOR_H
 #define LISTITERATOR_H
 
-template <typename T>
-class Node;
+#include "Node.h"
 
-template <typename T>
+template<typename T>
 class ListIterator {
-    Node<T> *current;
+private:
+    Node<T>* itptr;
 
 public:
-    ListIterator(Node<T> *start) : current(start) {}
-    T operator*() const { return current->data; }
-    ListIterator<T>& operator++() {
-        current = current->next;
+    // Constructors
+    ListIterator() : itptr(nullptr) {}
+    ListIterator(const ListIterator<T>& q) : itptr(q.itptr) {}
+    ListIterator(Node<T>* q) : itptr(q) {}
+
+    // Overloaded operators
+    ListIterator& operator++ () { 
+        itptr = itptr->next;
         return *this;
     }
-    bool operator!=(const ListIterator<T>& other) const {
-        return current != other.current;
+    ListIterator operator++ (int) { 
+        ListIterator<T> tmp = *this; 
+        ++(*this); 
+        return tmp; 
+    }
+    bool operator== (const ListIterator<T>& q) const {
+        return itptr == q.itptr;
+    }
+    bool operator!= (const ListIterator<T>& q) const {
+        return itptr != q.itptr;
+    }
+    T& operator* () {
+        return itptr->data;
     }
 };
 
 #endif
+
