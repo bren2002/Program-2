@@ -12,8 +12,10 @@ class Node {
 public:
     T data;
     Node<T> *next;
-
-    Node(T newData) : data(newData), next(nullptr) {}
+    Node(T newData) {
+        data = newData;
+        next = nullptr;
+    }
 };
 
 #endif
