@@ -8,6 +8,7 @@
 #define LINKEDLIST_H
 
 #include "ListIterator.h"
+#include <stdexcept>
 
 template<typename T>
 class LinkedList {
