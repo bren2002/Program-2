@@ -4,119 +4,188 @@
  * March 25, 2024
  */
 
-#ifndef LINKEDLIST_H
-#define LINKEDLIST_H
+#ifndef LINKED_LIST_H
+#define LINKED_LIST_H
 
+#include "Node.h"
 #include "ListIterator.h"
 #include <stdexcept>
 
-template<typename T>
+template<class T>
 class LinkedList {
 private:
-    struct Node {
-        T data;
-        Node* next;
-
-        Node(const T& newData, Node* newNext = nullptr) : data(newData), next(newNext) {}
-    };
-
-    Node* head;
-    Node* tail;
-    int size;
+    Node<T> *head;
+    Node<T> *tail;
+    int currentSize;
 
 public:
-    LinkedList() : head(nullptr), tail(nullptr), size(0) {}
+    LinkedList() : head(nullptr), tail(nullptr), currentSize(0) {}
 
-    ~LinkedList() {
-        makeEmpty();
+    int size() const {
+        return currentSize;
     }
 
     bool isEmpty() const {
-        return size == 0;
+        return head == nullptr;
     }
 
-    int getSize() const {
-        return size;
-    }
+    void addAt(int index, T obj) {
+        if (index < 0 || index > currentSize)
+            throw std::runtime_error("Error: addAt bad index");
 
-    void addLast(const T& item) {
-        if (isEmpty()) {
-            head = tail = new Node(item);
-        } else {
-            tail->next = new Node(item);
-            tail = tail->next;
-        }
-        size++;
-    }
-
-    void addFirst(const T& item) {
-        head = new Node(item, head);
-        if (!tail) {
-            tail = head;
-        }
-        size++;
-    }
-
-    void addAt(int index, const T& item) {
-        if (index < 0 || index > size) {
-            throw std::out_of_range("Index out of range");
-        }
         if (index == 0) {
-            addFirst(item);
-        } else if (index == size) {
-            addLast(item);
+            addFirst(obj);
+        } else if (index == currentSize) {
+            addLast(obj);
         } else {
-            Node* current = head;
+            Node<T> *newNode = new Node<T>(obj);
+            Node<T> *current = head;
             for (int i = 0; i < index - 1; ++i) {
                 current = current->next;
             }
-            current->next = new Node(item, current->next);
-            size++;
+            newNode->next = current->next;
+            current->next = newNode;
+            ++currentSize;
+        }
+    }
+
+    void addFirst(T obj) {
+        Node<T> *newNode = new Node<T>(obj);
+        if (isEmpty()) {
+            head = tail = newNode;
+        } else {
+            newNode->next = head;
+            head = newNode;
+        }
+        ++currentSize;
+    }
+
+    void addLast(T obj) {
+        Node<T> *newNode = new Node<T>(obj);
+        if (isEmpty()) {
+            head = tail = newNode;
+        } else {
+            tail->next = newNode;
+            tail = newNode;
+        }
+        ++currentSize;
+    }
+
+    T peekFirst() const {
+        if (isEmpty())
+            throw std::runtime_error("Error: peekFirst empty list");
+        return head->data;
+    }
+
+    T peekLast() const {
+        if (isEmpty())
+            throw std::runtime_error("Error: peekLast empty list");
+        return tail->data;
+    }
+
+    void removeAt(int index) {
+        if (isEmpty())
+            throw std::runtime_error("Error: removeAt empty list");
+        if (index < 0 || index >= currentSize)
+            throw std::runtime_error("Error: removeAt bad index");
+
+        if (index == 0) {
+            removeFirst();
+        } else if (index == currentSize - 1) {
+            removeLast();
+        } else {
+            Node<T> *current = head;
+            for (int i = 0; i < index - 1; ++i) {
+                current = current->next;
+            }
+            Node<T> *nodeToDelete = current->next;
+            current->next = current->next->next;
+            delete nodeToDelete;
+            --currentSize;
         }
     }
 
     T removeFirst() {
-        if (isEmpty()) {
-            throw std::runtime_error("List is empty");
-        }
-        T removedItem = head->data;
-        Node* temp = head;
+        if (isEmpty())
+            throw std::runtime_error("Error: removeFirst empty list");
+        Node<T> *nodeToDelete = head;
+        T dataToReturn = head->data;
         head = head->next;
-        delete temp;
-        if (!head) {
+        if (head == nullptr)
             tail = nullptr;
-        }
-        size--;
-        return removedItem;
+        delete nodeToDelete;
+        --currentSize;
+        return dataToReturn;
     }
 
     T removeLast() {
-        if (isEmpty()) {
-            throw std::runtime_error("List is empty");
-        }
-        T removedItem;
+        if (isEmpty())
+            throw std::runtime_error("Error: removeLast empty list");
+        Node<T> *nodeToDelete = tail;
+        T dataToReturn = tail->data;
         if (head == tail) {
-            removedItem = head->data;
-            delete head;
             head = tail = nullptr;
         } else {
-            Node* temp = head;
-            while (temp->next != tail) {
-                temp = temp->next;
+            Node<T> *current = head;
+            while (current->next != tail) {
+                current = current->next;
             }
-            removedItem = tail->data;
-            delete tail;
-            tail = temp;
-            tail->next = nullptr;
+            current->next = nullptr;
+            tail = current;
         }
-        size--;
-        return removedItem;
+        delete nodeToDelete;
+        --currentSize;
+        return dataToReturn;
     }
 
-    bool contains(const T& item) const {
-        Node* current = head;
-        while (current) {
-            if (current->data == item) {
+    int find(T obj) const {
+        int index = 0;
+        Node<T> *current = head;
+        while (current != nullptr) {
+            if (current->data == obj) {
+                return index;
+            }
+            current = current->next;
+            ++index;
+        }
+        return -1;
+    }
+
+    bool isFull() const {
+        return false;
+    }
+
+    void makeEmpty() {
+        Node<T> *current = head;
+        while (current != nullptr) {
+            Node<T> *next = current->next;
+            delete current;
+            current = next;
+        }
+        head = tail = nullptr;
+        currentSize = 0;
+    }
+
+    bool contains(T obj) const {
+        return find(obj) != -1;
+    }
+
+    bool remove(T obj) {
+        if (isEmpty())
+            return false;
+
+        if (head->data == obj) {
+            removeFirst();
+            return true;
+        }
+
+        Node<T> *current = head;
+        while (current->next != nullptr) {
+            if (current->next->data == obj) {
+                Node<T> *nodeToDelete = current->next;
+                current->next = current->next->next;
+                delete nodeToDelete;
+                --currentSize;
                 return true;
             }
             current = current->next;
@@ -124,77 +193,10 @@ public:
         return false;
     }
 
-    int find(const T& item) const {
-        Node* current = head;
-        int index = 0;
-        while (current) {
-            if (current->data == item) {
-                return index;
-            }
-            current = current->next;
-            index++;
+    void removeAll(T obj) {
+        while (contains(obj)) {
+            remove(obj);
         }
-        return -1; // Not found
-    }
-
-    void removeAll(const T& item) {
-        Node* current = head;
-        Node* prev = nullptr;
-        while (current) {
-            if (current->data == item) {
-                if (prev) {
-                    prev->next = current->next;
-                    delete current;
-                    current = prev->next;
-                } else {
-                    Node* temp = head;
-                    head = head->next;
-                    delete temp;
-                    current = head;
-                }
-                size--;
-            } else {
-                prev = current;
-                current = current->next;
-            }
-        }
-        tail = prev;
-    }
-
-    void makeEmpty() {
-        Node* current = head;
-        while (current) {
-            Node* temp = current;
-            current = current->next;
-            delete temp;
-        }
-        head = tail = nullptr;
-        size = 0;
-    }
-
-    T getAt(int index) const {
-        if (index < 0 || index >= size) {
-            throw std::out_of_range("Index out of range");
-        }
-        Node* current = head;
-        for (int i = 0; i < index; ++i) {
-            current = current->next;
-        }
-        return current->data;
-    }
-
-    T peekFirst() const {
-        if (isEmpty()) {
-            throw std::runtime_error("List is empty");
-        }
-        return head->data;
-    }
-
-    T peekLast() const {
-        if (isEmpty()) {
-            throw std::runtime_error("List is empty");
-        }
-        return tail->data;
     }
 
     ListIterator<T> first() const {
@@ -204,9 +206,14 @@ public:
     ListIterator<T> end() const {
         return ListIterator<T>(nullptr);
     }
+
+    ~LinkedList() {
+        makeEmpty();
+    }
 };
 
 #endif
+
 
 
 
