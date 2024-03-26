@@ -7,14 +7,7 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-#include <stdexcept>
-
-template<typename T>
-struct Node {
-    T data;
-    Node<T>* next;
-    Node(const T& item, Node<T>* nextNode = nullptr) : data(item), next(nextNode) {}
-};
+#include "ListIterator.h"
 
 template<typename T>
 class LinkedList {
@@ -27,16 +20,90 @@ public:
     LinkedList() : head(nullptr), tail(nullptr), size(0) {}
     ~LinkedList();
 
-    bool isEmpty() const;
-    int getSize() const;
-    void append(const T& item);
-    void prepend(const T& item);
-    void insertAt(int index, const T& item);
-    T removeAt(int index);
-    T getAt(int index) const;
+    bool isEmpty() const {
+        return size == 0;
+    }
 
-    bool isFull() const {
-        return false; 
+    int getSize() const {
+        return size;
+    }
+
+    void append(const T& item) {
+        if (isEmpty()) {
+            head = new Node<T>(item);
+            tail = head;
+        } else {
+            tail->next = new Node<T>(item);
+            tail = tail->next;
+        }
+        size++;
+    }
+
+    void prepend(const T& item) {
+        head = new Node<T>(item, head);
+        if (!tail) {
+            tail = head;
+        }
+        size++;
+    }
+
+    void insertAt(int index, const T& item) {
+        if (index < 0 || index > size) {
+            throw std::out_of_range("Index out of range");
+        }
+        if (index == 0) {
+            prepend(item);
+        } else if (index == size) {
+            append(item);
+        } else {
+            Node<T>* current = head;
+            for (int i = 0; i < index - 1; ++i) {
+                current = current->next;
+            }
+            current->next = new Node<T>(item, current->next);
+            size++;
+        }
+    }
+
+    T removeAt(int index) {
+        if (isEmpty() || index < 0 || index >= size) {
+            throw std::out_of_range("Index out of range");
+        }
+        T removedItem;
+        if (index == 0) {
+            removedItem = head->data;
+            Node<T>* temp = head;
+            head = head->next;
+            delete temp;
+            if (!head) {
+                tail = nullptr;
+            }
+        } else {
+            Node<T>* current = head;
+            for (int i = 0; i < index - 1; ++i) {
+                current = current->next;
+            }
+            Node<T>* temp = current->next;
+            removedItem = temp->data;
+            current->next = temp->next;
+            delete temp;
+            if (!current->next) {
+                tail = current;
+            }
+        }
+        size--;
+        return removedItem;
+    }
+
+    T getAt(int index) const {
+        if (index < 0 || index >= size) {
+            throw std::out_of_range("Index out of range");
+        }
+        Node<T>* current = head;
+        for (int i = 0; i < index; ++i) {
+            current = current->next;
+        }
+        return current->data;
     }
 
     T peekFirst() const {
@@ -84,6 +151,15 @@ public:
         }
         size--;
     }
+
+    ListIterator<T> begin() const {
+        return ListIterator<T>(head);
+    }
+
+    ListIterator<T> end() const {
+        return ListIterator<T>(nullptr);
+    }
 };
 
 #endif
+
