@@ -4,68 +4,28 @@
  * March 25, 2024
  */
 
-#ifndef LINKED_LIST_PQ_H
-#define LINKED_LIST_PQ_H
+#ifndef LINKEDLISTPQ_H
+#define LINKEDLISTPQ_H
 
-#include "PriorityQueue.h"
 #include "LinkedList.h"
 
-template<typename T>
-class LinkedListPQ : public PriorityQueue<T> {
+template <typename T>
+class LinkedListPQ {
 private:
-    LinkedList<T> pq;
+    LinkedList<T> list;
 
 public:
-    bool insert(T object) override {
-        pq.addLast(object);
-        return true;
-    }
-
-    T remove() override {
-        if (pq.isEmpty()) {
-            throw std::invalid_argument("Cannot remove from empty queue");
-        }
-        return pq.removeFirst();
+    void push(const T& data) {
+        list.insert(data);
     }
     
-    bool deleteAll(T obj) override {
-        return pq.remove(obj);
+    ListIterator<T> first() {
+        return list.first();
     }
 
-    T peek() override {
-        if (pq.isEmpty()) {
-            throw std::invalid_argument("Cannot peek from empty queue");
-        }
-        return pq.peekFirst();
-    }
-
-    bool contains(T obj) override {
-        return pq.contains(obj);
-    } 
-
-    int size() override {
-        return pq.size();
-    }
-    
-    void clear() override {
-        pq.makeEmpty();
-    }
-
-    bool isEmpty() override {
-        return pq.isEmpty();
-    }
-
-    bool isFull() override {
-        return false;
-    }
-        
-    ListIterator<T> first() override {
-        return pq.first();
-    }
-
-    ListIterator<T> end() override {
-        return pq.end();
+    ListIterator<T> end() {
+        return list.end();
     }
 };
 
-#endif
+#endif 
