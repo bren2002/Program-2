@@ -16,14 +16,37 @@ private:
     LinkedList<T> list;
 
 public:
-    ListIterator<T> first() {
-        return list.first();
+    LinkedListPQ() {}
+
+    void enqueue(const T& item) {
+        list.append(item); 
     }
 
-    ListIterator<T> end() {
+    T dequeue() {
+        if (list.isEmpty()) {
+            throw std::runtime_error("Priority queue is empty");
+        }
+        T item = list.peekFirst();
+        list.removeFirst();
+        return item;
+    }
+
+    bool isEmpty() const {
+        return list.isEmpty();
+    }
+
+    int getSize() const {
+        return list.getSize();
+    }
+
+    ListIterator<T> begin() const {
+        return list.begin();
+    }
+
+    ListIterator<T> end() const {
         return list.end();
     }
-
 };
 
 #endif
+
