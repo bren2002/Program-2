@@ -4,42 +4,46 @@
  * March 25, 2024
  */
 
-#ifndef LISTITERATOR_H
-#define LISTITERATOR_H
+#ifndef LIST_ITERATOR_H
+#define LIST_ITERATOR_H
 
 #include "Node.h"
 
-template<typename T>
+template<class T>
 class ListIterator {
 private:
-    Node<T>* itptr;
+    Node<T> *currentNode;
 
 public:
-    // Constructors
-    ListIterator() : itptr(nullptr) {}
-    ListIterator(const ListIterator<T>& q) : itptr(q.itptr) {}
-    ListIterator(Node<T>* q) : itptr(q) {}
+    ListIterator(Node<T> *startNode) : currentNode(startNode) {}
 
-    // Overloaded operators
-    ListIterator& operator++ () { 
-        itptr = itptr->next;
+    ListIterator<T> &operator++() {
+        if (currentNode != nullptr)
+            currentNode = currentNode->next;
         return *this;
     }
-    ListIterator operator++ (int) { 
-        ListIterator<T> tmp = *this; 
-        ++(*this); 
-        return tmp; 
+
+    ListIterator<T> operator++(int) {
+        ListIterator<T> temp = *this;
+        ++(*this);
+        return temp;
     }
-    bool operator== (const ListIterator<T>& q) const {
-        return itptr == q.itptr;
+
+    T &operator*() const {
+        if (currentNode == nullptr)
+            throw std::runtime_error("Error: dereference of end iterator");
+        return currentNode->data;
     }
-    bool operator!= (const ListIterator<T>& q) const {
-        return itptr != q.itptr;
+
+    bool operator==(const ListIterator<T> &other) const {
+        return currentNode == other.currentNode;
     }
-    T& operator* () {
-        return itptr->data;
+
+    bool operator!=(const ListIterator<T> &other) const {
+        return !(*this == other);
     }
 };
 
 #endif
+
 
