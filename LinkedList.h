@@ -7,74 +7,83 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-#include "Node.h"
-#include "ListIterator.h"
+#include <stdexcept>
 
-template <typename T>
-class LinkedList {
-    Node<T> *head;
-    Node<T> *tail;
-
-public:
-    LinkedList() : head(nullptr), tail(nullptr) {}
-    bool isEmpty() const { return head == nullptr; }
-    void addFirst(const T& data);
-    void addLast(const T& data);
-    int size() const;
-    bool contains(const T& data) const;
-    int find(const T& data) const;
-    void makeEmpty();
-    void addAt(int index, const T& data);
-    void removeAt(int index);
-    void removeAll(const T& data);
-    ListIterator<T> first() const { return ListIterator<T>(head); }
-    ListIterator<T> end() const { return ListIterator<T>(nullptr); }
-    ~LinkedList();
+template<typename T>
+struct Node {
+    T data;
+    Node<T>* next;
+    Node(const T& item, Node<T>* nextNode = nullptr) : data(item), next(nextNode) {}
 };
 
-template <typename T>
-void LinkedList<T>::addFirst(const T& data) {
-    if (isEmpty()) {
-        head = tail = new Node<T>(data);
-    } else {
-        head = new Node<T>(data, head);
+template<typename T>
+class LinkedList {
+private:
+    Node<T>* head;
+    Node<T>* tail;
+    int size;
+
+public:
+    LinkedList() : head(nullptr), tail(nullptr), size(0) {}
+    ~LinkedList();
+
+    bool isEmpty() const;
+    int getSize() const;
+    void append(const T& item);
+    void prepend(const T& item);
+    void insertAt(int index, const T& item);
+    T removeAt(int index);
+    T getAt(int index) const;
+
+    bool isFull() const {
+        return false; 
     }
-}
 
-template <typename T>
-void LinkedList<T>::addLast(const T& data) {
-    if (isEmpty()) {
-        head = tail = new Node<T>(data);
-    } else {
-        tail->next = new Node<T>(data);
-        tail = tail->next;
+    T peekFirst() const {
+        if (isEmpty()) {
+            throw std::runtime_error("List is empty");
+        }
+        return head->data;
     }
-}
 
-template <typename T>
-int LinkedList<T>::size() const {
-    int count = 0;
-    Node<T> *current = head;
-    while (current != nullptr) {
-        count++;
-        current = current->next;
+    T peekLast() const {
+        if (isEmpty()) {
+            throw std::runtime_error("List is empty");
+        }
+        return tail->data;
     }
-    return count;
-}
 
-template <typename T>
-LinkedList<T>::~LinkedList() {
-    makeEmpty();
-}
-
-template <typename T>
-void LinkedList<T>::makeEmpty() {
-    while (head != nullptr) {
-        Node<T> *temp = head;
+    void removeFirst() {
+        if (isEmpty()) {
+            throw std::runtime_error("List is empty");
+        }
+        Node<T>* temp = head;
         head = head->next;
         delete temp;
+        if (!head) {
+            tail = nullptr;
+        }
+        size--;
     }
-    tail = nullptr;
-}
+
+    void removeLast() {
+        if (isEmpty()) {
+            throw std::runtime_error("List is empty");
+        }
+        if (head == tail) {
+            delete head;
+            head = tail = nullptr;
+        } else {
+            Node<T>* temp = head;
+            while (temp->next != tail) {
+                temp = temp->next;
+            }
+            delete tail;
+            tail = temp;
+            tail->next = nullptr;
+        }
+        size--;
+    }
+};
 
 #endif
