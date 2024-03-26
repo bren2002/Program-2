@@ -10,17 +10,6 @@
 #include "PriorityQueue.h"
 #include "LinkedList.h"
 
-/**
- * @class LinkedListPQ
- * 
- * @brief A priority queue implementation using a linked list.
- * 
- * @details The LinkedListPQ class inherits from the PriorityQueue class and provides methods to create and manipulate a priority queue using a linked list.
- * 
- * @tparam T The type of elements stored in the priority queue.
- * 
- * @todo Create a priority queue using a linked list. Refer to PriorityQueue.h for details on methods
- */
 template<typename T>
 class LinkedListPQ : public PriorityQueue<T> {
 private:
