@@ -4,31 +4,38 @@
  * March 25, 2024
  */
 
-#ifndef LIST_ITERATOR_H
-#define LIST_ITERATOR_H
+#ifndef LISTITERATOR_H
+#define LISTITERATOR_H
 
 #include "Node.h"
 
-template<typename T>
+template <typename T>
 class ListIterator {
-
 private:
-    Node<T> *current;
+    Node<T>* current;
 
 public:
-    ListIterator(Node<T> *start) : current(start) {}
+    ListIterator() : current(nullptr) {} 
 
-    T operator*() {
-        return current->data;
-    }
+    ListIterator(Node<T>* start) : current(start) {}
 
     ListIterator<T>& operator++() {
-        current = current->next;
+        if (current) {
+            current = current->next;
+        }
         return *this;
     }
 
-    bool operator!=(const ListIterator<T>& other) {
-        return current != other.current;
+    T& operator*() const {
+        return current->data;
+    }
+
+    bool operator==(const ListIterator<T>& other) const {
+        return current == other.current;
+    }
+
+    bool operator!=(const ListIterator<T>& other) const {
+        return !(*this == other);
     }
 };
 
