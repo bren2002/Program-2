@@ -7,13 +7,13 @@
 #ifndef NODE_H
 #define NODE_H
 
-template<typename T>
+template <typename T>
 class Node {
 public:
     T data;
-    Node<T> *next;
-    
-    Node(T newData) : data(newData), next(nullptr) {}
+    Node<T>* next;
+
+    Node(T data) : data(data), next(nullptr) {}
 };
 
 #endif
