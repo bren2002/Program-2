@@ -8,46 +8,87 @@
 #define LINKED_LIST_PQ_H
 
 #include "PriorityQueue.h"
-#include "LinkedList.h"
+#include <stdexcept>
+#include <iostream> // Include iostream for std::ostream
 
-template<class T>
+template <typename T>
 class LinkedListPQ : public PriorityQueue<T> {
-private:
-    LinkedList<T> pq;
-
 public:
-    LinkedListPQ() {}
+    LinkedListPQ();
+    ~LinkedListPQ();
+    void insert(const T& data, int priority);
+    T removeMin();
+    bool isEmpty() const;
 
-    void enqueue(const T &element, int priority) override {
-        pq.addLast(element);
-    }
+protected:
+    void print(std::ostream& os) const override;
 
-    T dequeue() override {
-        if (isEmpty())
-            throw std::runtime_error("Error: dequeue from empty priority queue");
-        return pq.removeFirst();
-    }
+private:
+    struct Node {
+        T data;
+        int priority;
+        Node* next;
 
-    const T &peek() const override {
-        if (isEmpty())
-            throw std::runtime_error("Error: peek from empty priority queue");
-        return pq.peekFirst();
-    }
+        Node(const T& d, int p, Node* n) : data(d), priority(p), next(n) {}
+    };
 
-    bool isEmpty() const override {
-        return pq.isEmpty();
-    }
-
-    int size() const override {
-        return pq.size();
-    }
-
-    void clear() override {
-        pq.makeEmpty();
-    }
+    Node* m_front;
 };
 
-#endif
+template <typename T>
+LinkedListPQ<T>::LinkedListPQ() : m_front(nullptr) {}
 
+template <typename T>
+LinkedListPQ<T>::~LinkedListPQ() {
+    while (m_front) {
+        Node* next = m_front->next;
+        delete m_front;
+        m_front = next;
+    }
+}
 
+template <typename T>
+void LinkedListPQ<T>::insert(const T& data, int priority) {
+    if (!m_front || priority < m_front->priority) {
+        m_front = new Node(data, priority, m_front);
+    } else {
+        Node* prev = m_front;
+        Node* curr = m_front->next;
+        while (curr && priority >= curr->priority) {
+            prev = curr;
+            curr = curr->next;
+        }
+        prev->next = new Node(data, priority, curr);
+    }
+}
+
+template <typename T>
+T LinkedListPQ<T>::removeMin() {
+    if (isEmpty()) {
+        throw std::logic_error("Priority queue is empty");
+    }
+    T data = m_front->data;
+    Node* temp = m_front;
+    m_front = m_front->next;
+    delete temp;
+    return data;
+}
+
+template <typename T>
+bool LinkedListPQ<T>::isEmpty() const {
+    return !m_front;
+}
+
+template <typename T>
+void LinkedListPQ<T>::print(std::ostream& os) const {
+    Node* curr = m_front;
+    os << "Priority Queue (Lowest Priority to Highest Priority): ";
+    while (curr) {
+        os << "(" << curr->data << ", " << curr->priority << ") ";
+        curr = curr->next;
+    }
+    os << std::endl;
+}
+
+#endif 
 
